@@ -1,0 +1,106 @@
+name: dev-ci-workflow
+
+on:
+  push:
+    branches:
+      - feature/*
+      - hotfix/*
+
+env:
+  DOCKER_REGISTRY: dockerdev-enp.bin.cloud.barco.com
+  DOCKER_REPO: varun
+  IMAGE_NAME: cheeseshop
+  IMAGE_VERSION: 1.0.0
+  TARGET_DIRECTORY: docker-cheeseshop
+  
+jobs:
+  # bump_version:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+
+  #     - name: Get current version from VERSION file
+  #       id: get_current_version
+  #       run: |
+  #         echo "::set-output name=current_version::$(find . -name "VERSION" | xargs cat)"
+
+  #     - name: Bump image version
+  #       id: bump_image_version
+  #       uses: christian-draeger/increment-semantic-version@1.0.2
+  #       with:
+  #         current-version: ${{ steps.get_current_version.outputs.current_version }}
+  #         version-fragment: 'beta'
+        
+  #     - name: Update VERSION file
+  #       run: |
+  #         cd Level1/app;
+  #         echo $NEXT_VERSION > VERSION
+  #       env:
+  #         NEXT_VERSION: "${{ steps.bump_image_version.outputs.next-version }}"
+        
+  #     # - name: Commit updated VERSION file
+  #     #   uses: EndBug/add-and-commit@v7
+  #     #   with:
+  #     #     message: "[skip ci] Bumped version from ${{ steps.get_current_version.outputs.current_version }} to ${{ steps.bump_image_version.outputs.next-version }}" 
+        
+  #     - name: Commit updated VERSION file
+  #       uses: stefanzweifel/git-auto-commit-action@v4
+  #       with:
+  #         commit_message: "[skip ci] Bumped version from ${{ steps.get_current_version.outputs.current_version }} to ${{ steps.bump_image_version.outputs.next-version }}"
+  #         commit_options: '--amend'
+  #         push_options: '--force'
+  #         skip_fetch: true
+
+
+  check_existing_image:
+    runs-on: ubuntu-latest
+    # needs: [bump_version]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # - name: Get latest image version
+      #   id: get_latest_version
+      #   run: |
+      #     echo "::set-output name=latest_version::$(find . -name "VERSION" | xargs cat)"
+          
+      - name: Check for existing Docker image version
+        id: docker_image_version_exists
+        run: |
+          docker login $DOCKER_REGISTRY -u $ARTIFACTORY_USER -p $ARTIFACTORY_PWD
+          if `docker manifest inspect $IMAGE > /dev/null`; then
+            echo "Image - $IMAGE - already exists."
+            exit -1
+          else
+            echo "Image - $IMAGE - DOES NOT exist."
+            exit 0
+          fi
+        env:
+          ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PWD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          IMAGE: ${{ format('{0}/{1}/{2}:{3}', env.DOCKER_REGISTRY, env.DOCKER_REPO, env.IMAGE_NAME, env.IMAGE_VERSION) }}
+          # Leaving it here to remember that this method is also available.
+          # IMAGE: "${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/${{ env.IMAGE_NAME }}:${{ steps.get_latest_version.outputs.latest_version }}"
+
+
+  build_push_docker_image:
+    runs-on: ubuntu-latest
+    needs: [check_existing_image]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build & push Docker image
+        id: build_push_image
+        uses: mr-smithers-excellent/docker-build-push@v5
+        if: needs.check_existing_image.steps.docker_image_version_exists.outcome != 'success'
+        with:
+          image: ${{ format('{0}/{1}', env.DOCKER_REPO, env.IMAGE_NAME) }}
+          tags: $IMAGE_VERSION
+          registry: $DOCKER_REGISTRY
+          directory: $TARGET_DIRECTORY
+          dockerfile: ${{ format('{0}/Dockerfile', env.TARGET_DIRECTORY) }}
+          username: ${{ secrets.ARTIFACTORY_USERNAME }}
+          password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          buildArgs: ORGANIZATION="Barco", DESCRIPTION="Cheese Shop microservice with GitHub"
