@@ -12,20 +12,7 @@ on:
       - master
 
 jobs:
-  # This job is only here to pass the GITHUB_RUN_NUMBER envVar from this calling workflow to the
-  # called workflow. Currently, GitHub does not allow for envVars from calling workflow to be consumed by called workflow. So, this is a workaround/hack.
-  # github-run-number:
-  #   runs-on: ubuntu-latest
-  #   name: Provide GITHUB_RUN_NUMBER
-  #   outputs:
-  #     github-run-number: ${{ steps.github-run-number.outputs.github-run-number }}
-  #   steps:
-  #     - id: github-run-number
-  #       run: |
-  #         echo "::set-output name=github-run-number::$GITHUB_RUN_NUMBER"
-
   create-master-tag:
-    # if: github.event.base_ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Create latest tag to be used when creating docker image on master
     outputs:
@@ -48,7 +35,7 @@ jobs:
         env:
           tag: ${{ steps.bump_tag.outputs.new_tag }}
 
-  # This is the actual calling job that calls the reusable workflow.
+  # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
   dockerdev-enp-push:
     if: github.ref != 'refs/heads/master'
     uses: ./.github/workflows/docker-build-push.yaml
@@ -64,7 +51,8 @@ jobs:
       registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
       registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
   
-  # This is the actual calling job that calls the reusable workflow.
+  
+  # This is the actual calling job that calls the reusable workflow - to push image into Docker-Enp Artifactory Repo.
   docker-enp-push:
     if: ${{ github.event.pull_request.merged == true && github.ref == 'refs/heads/master' }}
     needs: [create-master-tag]
