@@ -30,20 +30,24 @@ jobs:
         with:
           fetch-depth: '2'
       
-      # - name: Bump all tags everywhere
-      #   uses: undergroundwires/bump-everywhere@master
+      - name: Bump version and push tag
+        id: bump_tag
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
 
-      - name: 'Get Previous tag'
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1.1.0"
-        with:
-          fallback: 1.0.0 # Optional fallback tag to use when no tag can be found
+      # - name: 'Get Previous tag'
+      #   id: previoustag
+      #   uses: "WyriHaximus/github-action-get-previous-tag@v1.1.0"
+      #   with:
+      #     fallback: 1.0.0 # Optional fallback tag to use when no tag can be found
         
       - shell: bash
         run: |
           echo "Current Latest Tag: $tag"
         env:
-          tag: ${{ steps.previoustag.outputs.tag }}
+          tag: ${{ steps.bump_tag.outputs.new_tag }}
 
   # This is the actual calling job that calls the reusable workflow.
   dockerdev-enp-push:
