@@ -37,6 +37,7 @@ jobs:
           DRY_RUN: true
           PRERELEASE_SUFFIX: ${{ github.sha }}
           RELEASE_BRANCHES: .*
+          TAG_CONTEXT: branch
         
       - shell: bash
         run: |
