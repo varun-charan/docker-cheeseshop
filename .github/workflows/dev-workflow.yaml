@@ -26,6 +26,8 @@ jobs:
     outputs:
       master-tag: ${{ steps.previoustag.outputs.tag }}
     steps:
+      - uses: actions/checkout@v2
+      
       # - name: Bump all tags everywhere
       #   uses: undergroundwires/bump-everywhere@master
       - name: 'Get Previous tag'
