@@ -18,10 +18,12 @@ on:
         type: string
       image_tag:
         description: "Tag/Version of the Docker image"
-        required: true
+        required: false
+        default: $GITHUB_RUN_NUMBER
         type: string
       build_directory:
         description: "Path to the build directory where the Dockerfile is kept"
+        required: true
         type: string
       maintainer:
         description: "Name of maintainer of the Docker image"
