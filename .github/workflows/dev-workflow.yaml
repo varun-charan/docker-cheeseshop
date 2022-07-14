@@ -6,6 +6,9 @@ on:
       - feature/*
       - hotfix/*
 
+env:
+  gitlab_run_number: ${GITHUB_RUN_NUMBER}
+
 jobs:
   debug:
     runs-on: ubuntu-latest
@@ -20,7 +23,7 @@ jobs:
       docker_registry: dockerdev-enp.bin.cloud.barco.com
       docker_repo: varun
       image_name: cheeseshop
-      image_tag: ${{ GITHUB_RUN_NUMBER }}
+      image_tag: ${{ env.gitlab_run_number }}
       build_directory: docker-cheeseshop
       maintainer: "varun.charan@barco.com"
     secrets:
