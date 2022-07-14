@@ -11,7 +11,7 @@ on:
 
 jobs:
   docker-dev:
-  - uses: ./.github/workflows/docker-build-push.yaml
+    uses: ./.github/workflows/docker-build-push.yaml
     with:
       docker_registry: dockerdev-enp.bin.cloud.barco.com
       docker_repo: varun
