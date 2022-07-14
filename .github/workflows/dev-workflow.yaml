@@ -6,9 +6,6 @@ on:
       - feature/*
       - hotfix/*
 
-env:
-  gitlab_run_number: ${GITHUB_RUN_NUMBER}
-
 jobs:
   debug:
     runs-on: ubuntu-latest
@@ -17,13 +14,25 @@ jobs:
         run: |
           echo $GITHUB_RUN_NUMBER
 
+  github-run-number:
+    runs-on: ubuntu-latest
+    name: Provide GITHUB_RUN_NUMBER
+    outputs:
+      github-run-number: ${{ steps.github-run-number.outputs.github-run-number }}
+    steps:
+      - id: github-run-number
+        run: |
+          echo "::set-output name=github-run-number::$GITHUB_RUN_NUMBER"
+
+
   docker-dev:
     uses: ./.github/workflows/docker-build-push.yaml
+    needs: [github-run-number]
     with:
       docker_registry: dockerdev-enp.bin.cloud.barco.com
       docker_repo: varun
       image_name: cheeseshop
-      image_tag: ${{ env.gitlab_run_number }}
+      image_tag: ${{ job.github-run-number.outputs.github-run-number }}
       build_directory: docker-cheeseshop
       maintainer: "varun.charan@barco.com"
     secrets:
