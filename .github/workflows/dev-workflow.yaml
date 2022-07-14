@@ -8,14 +8,20 @@ on:
   
 jobs:
   docker-dev:
-    - uses: ./.github/workflows/docker-build-push.yaml
-      with:
-        docker_registry: dockerdev-enp.bin.cloud.barco.com
-        docker_repo: varun
-        image_name: cheeseshop
-        image_tag: $GITHUB_RUN_NUMBER
-        build_directory: docker-cheeseshop
-        maintainer: "varun.charan@barco.com"
-      secrets:
-        registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
-        registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+    - uses:
+      run: |
+        pwd
+        ls -la
+        find . -name "docker-build-push"
+
+    # - uses: ./.github/workflows/docker-build-push.yaml
+    #   with:
+    #     docker_registry: dockerdev-enp.bin.cloud.barco.com
+    #     docker_repo: varun
+    #     image_name: cheeseshop
+    #     image_tag: $GITHUB_RUN_NUMBER
+    #     build_directory: docker-cheeseshop
+    #     maintainer: "varun.charan@barco.com"
+    #   secrets:
+    #     registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
+    #     registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
