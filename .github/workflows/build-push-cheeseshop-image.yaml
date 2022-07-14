@@ -34,7 +34,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
+          # DO NOT create Git tag. Just calculate new tag version.
           DRY_RUN: true
+          # Helps avoid duplicate Docker image tags when two branches are created from same master commit.
           PRERELEASE_SUFFIX: ${{ github.sha }}
         
       - shell: bash
