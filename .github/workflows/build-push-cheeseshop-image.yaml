@@ -14,6 +14,7 @@ on:
     branches:
       # Meant for running after PR merged on master
       - master
+  workflow_dispatch:
 
 jobs:
   create-master-tag:
