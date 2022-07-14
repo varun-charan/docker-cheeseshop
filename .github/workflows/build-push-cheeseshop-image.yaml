@@ -36,7 +36,7 @@ jobs:
           WITH_V: true
           DRY_RUN: true
           PRERELEASE_SUFFIX: ${{ github.sha }}
-          VERBOSE: true
+          RELEASE_BRANCHES: .*
         
       - shell: bash
         run: |
@@ -95,4 +95,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
-          RELEASE_BRANCHES: master
