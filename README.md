@@ -1,6 +1,5 @@
-# cheeseshop
-Reserved for small experiments
+# Cheese Shop
 
-# Badges
-![build-push-cheeseshop-image](https://github.com/varun-charan/cheeseshop/actions/workflows/build-push-cheeseshop-image.yaml/badge.svg?event=push)
+![build-push-cheeseshop-image](https://github.com/varun-charan/cheeseshop/actions/workflows/build-push-cheeseshop-image.yaml/badge.svg?branch=master)
+<br><br><br><br>
 
