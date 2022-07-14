@@ -5,7 +5,7 @@ on:
     types:
       - closed
     branches:
-      - develop
+      - master
 
 env:
   DOCKER_REGISTRY: docker-enp.bin.cloud.barco.com
