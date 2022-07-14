@@ -8,11 +8,13 @@ on:
   
 jobs:
   docker-dev:
-    - uses:
-      run: |
-        pwd
-        ls -la
-        find . -name "docker-build-push"
+    runs-on: ubuntu-latest
+    steps:
+      - uses:
+        run: |
+          pwd
+          ls -la
+          find . -name "docker-build-push"
 
     # - uses: ./.github/workflows/docker-build-push.yaml
     #   with:
