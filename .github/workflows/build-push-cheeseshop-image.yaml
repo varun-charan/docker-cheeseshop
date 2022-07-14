@@ -37,7 +37,7 @@ jobs:
           # DO NOT create Git tag. Just calculate new tag version.
           DRY_RUN: true
           # Helps avoid duplicate Docker image tags when two branches are created from same master commit.
-          PRERELEASE_SUFFIX: ${{ format('{0}{1}', github.actor, github.sha) }}
+          PRERELEASE_SUFFIX: ${{ format('{0}.{1}', github.actor, github.sha) }}
         
       - shell: bash
         run: |
