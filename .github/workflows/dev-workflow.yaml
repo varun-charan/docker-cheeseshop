@@ -8,7 +8,8 @@ on:
   
 jobs:
   docker-dev:
-    - uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
+    - name: "Placeholder"
+      uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
       with:
         docker_registry: dockerdev-enp.bin.cloud.barco.com
         docker_repo: varun
