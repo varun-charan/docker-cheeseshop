@@ -62,7 +62,7 @@ jobs:
   
   # This is the actual calling job that calls the reusable workflow - to push image into Docker-Enp Artifactory Repo.
   docker-enp-push:
-    if: ${{ always() && github.ref != 'master' }}
+    if: ${{ always() && github.ref == 'master' }}
     needs: [ create-master-tag ]
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
