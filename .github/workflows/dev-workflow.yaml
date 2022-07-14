@@ -10,7 +10,7 @@ jobs:
   docker-dev:
     runs-on: ubuntu-latest
     steps:
-      - uses:
+      - shell: bash
         run: |
           pwd
           ls -la
