@@ -14,25 +14,27 @@ on:
     branches:
       # Meant for running after PR merged on master
       - master
+  # For manual trigger of job, if required. Avoids need to use dummy commits to initiate workflow.Applicable to all branches.
   workflow_dispatch:
 
 jobs:
-  create-master-tag:
+  get-next-tag-version:
     runs-on: ubuntu-latest
-    name: Create latest tag to be used when creating docker image on master
+    name: Get the next version of the tag
     outputs:
-      master-tag: ${{ steps.bump_tag.outputs.new_tag }}
+      next-tag: ${{ steps.get_next_tag.outputs.new_tag }}
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: '2'
       
-      - name: Bump version and push tag
-        id: bump_tag
+      - name: Get the next version of the tag
+        id: get_next_tag
         uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
+          DRY_RUN: true
         
       - shell: bash
         run: |
@@ -40,18 +42,18 @@ jobs:
           echo "Github ref: ${{ github.ref }}"
           echo "Pull Req Base Ref: ${{ github.event.pull_request.base.ref }}"
         env:
-          tag: ${{ steps.bump_tag.outputs.new_tag }}
+          tag: ${{ steps.get_next_tag.outputs.new_tag }}
 
   # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
   dockerdev-enp-push:
     if: ${{ always() && github.ref != 'master' }}
-    needs: [ create-master-tag ]
+    needs: [ get-next-tag-version ]
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
       docker_registry: dockerdev-enp.bin.cloud.barco.com
       docker_repo: varun
       image_name: cheeseshop
-      image_tag: ${{ needs.create-master-tag.outputs.master-tag }}
+      image_tag: ${{ needs.get-next-tag-version.outputs.next-tag }}
       build_directory: docker-cheeseshop
       maintainer: "varun.charan@barco.com"
     secrets:
@@ -62,15 +64,33 @@ jobs:
   # This is the actual calling job that calls the reusable workflow - to push image into Docker-Enp Artifactory Repo.
   docker-enp-push:
     if: ${{ always() && github.ref == 'master' }}
-    needs: [ create-master-tag ]
+    needs: [ get-next-tag-version ]
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
       docker_registry: docker-enp.bin.cloud.barco.com
       docker_repo: varun
       image_name: cheeseshop
-      image_tag: ${{ needs.create-master-tag.outputs.master-tag }}
+      image_tag: ${{ needs.get-next-tag-version.outputs.next-tag }}
       build_directory: docker-cheeseshop
       maintainer: "varun.charan@barco.com"
     secrets:
       registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
       registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+  # After a Docker image with the next version has been created, create a tag for the same in Git repo.
+  create-next-tag-version:
+    runs-on: ubuntu-latest
+    needs: [ dockerdev-enp-push, docker-enp-push ]
+    if: ${{ always() && github.ref == 'master' && contains(join(needs.*.result, ','), 'success') }}
+    name: Create the next version of the tag
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '2'
+      
+      - name: Get the next version of the tag
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          RELEASE_BRANCHES: master
