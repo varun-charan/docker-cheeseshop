@@ -15,7 +15,7 @@ jobs:
         run: |
           pwd
           ls -la
-          find . -name "docker-build-push"
+          find . -name "docker-build-push.yaml"
 
     # - uses: ./.github/workflows/docker-build-push.yaml
     #   with:
