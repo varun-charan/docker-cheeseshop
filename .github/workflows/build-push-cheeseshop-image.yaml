@@ -7,13 +7,15 @@ on:
       - feature/*
       # Meant for DEVOPS-* tickets
       - hotfix/*
-  pull_request:
-    types:
-      - closed
-      - synchronize
-    branches:
       # Meant for running after PR merged on master
       - master
+  # pull_request:
+  #   types:
+  #     - closed
+  #     - synchronize
+  #   branches:
+  #     # Meant for running after PR merged on master
+  #     - master
 
 jobs:
   create-master-tag:
@@ -43,7 +45,7 @@ jobs:
 
   # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
   dockerdev-enp-push:
-    if: ${{ always() && github.ref != 'refs/heads/master' }}
+    if: ${{ always() && github.ref != 'master' }}
     needs: [ create-master-tag ]
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
@@ -60,7 +62,7 @@ jobs:
   
   # This is the actual calling job that calls the reusable workflow - to push image into Docker-Enp Artifactory Repo.
   docker-enp-push:
-    if: ${{ always() && github.event.pull_request.base.ref == 'master' }}
+    if: ${{ always() && github.ref == 'master' }}
     needs: [ create-master-tag ]
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
