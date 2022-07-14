@@ -8,9 +8,11 @@ on:
 
 jobs:
   debug:
-    shell: bash
-    run: |
-      echo $GITHUB_RUN_NUMBER
+    runs-on: ubuntu-latest
+    steps:
+      shell: bash
+      run: |
+        echo $GITHUB_RUN_NUMBER
 
   docker-dev:
     uses: ./.github/workflows/docker-build-push.yaml
