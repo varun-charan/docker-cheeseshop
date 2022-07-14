@@ -14,8 +14,6 @@ on:
     branches:
       # Meant for running after PR merged on master
       - master
-  # For manual trigger of job, if required. Avoids need to use dummy commits to initiate workflow.Applicable to all branches.
-  workflow_dispatch:
 
 jobs:
   get-next-tag-version:
