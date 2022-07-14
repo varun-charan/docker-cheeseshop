@@ -20,7 +20,7 @@ on:
         description: "Tag/Version of the Docker image"
         required: false
         default: $GITHUB_RUN_NUMBER
-        type: string
+        type: number
       build_directory:
         description: "Path to the build directory where the Dockerfile is kept"
         required: true
