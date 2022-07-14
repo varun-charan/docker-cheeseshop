@@ -36,7 +36,7 @@ jobs:
           WITH_V: true
           DRY_RUN: true
           TAG_CONTEXT: branch
-          RELEASE_BRANCHES: master
+          RELEASE_BRANCHES: .*
         
       - shell: bash
         run: |
