@@ -45,13 +45,6 @@ env:
   BUILD_DIRECTORY: ${{ inputs.build_directory }}
   
 jobs:
-  dump_env_vars:
-    runs-on: ubuntu-latest
-    steps:
-      - shell: bash
-        run: |
-          printenv
-
   check_existing_image:
     runs-on: ubuntu-latest
     steps:

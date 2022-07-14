@@ -5,6 +5,11 @@ on:
     branches:
       - feature/*
       - hotfix/*
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master
 
 jobs:
   # This job is only here to pass the GITHUB_RUN_NUMBER envVar from this calling workflow to the
@@ -61,7 +66,7 @@ jobs:
   
   # This is the actual calling job that calls the reusable workflow.
   docker-enp-push:
-    # if: github.ref == 'refs/heads/master'
+    if: ${{ github.event.pull_request.merged == true && github.ref == 'refs/heads/master' }}
     needs: [create-master-tag]
     uses: ./.github/workflows/docker-build-push.yaml
     with:
