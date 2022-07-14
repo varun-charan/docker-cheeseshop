@@ -9,6 +9,7 @@ on:
       - hotfix/*
       # Meant for running after PR merged on master
       - master
+  workflow_dispatch:
 
 jobs:
   create-master-tag:
@@ -31,6 +32,7 @@ jobs:
       - shell: bash
         run: |
           echo "Current Latest Tag: $tag"
+          echo "Github ref: ${{ github.ref }}"
         env:
           tag: ${{ steps.bump_tag.outputs.new_tag }}
 
