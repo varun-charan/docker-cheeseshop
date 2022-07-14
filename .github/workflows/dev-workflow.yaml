@@ -10,25 +10,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - shell: bash
-        run: |
-          pwd
-          ls -la
-          find . -name "docker-build-push.yaml"
-
   docker-dev:
-    - uses: ./.github/workflows/docker-build-push.yaml
-      with:
-        docker_registry: dockerdev-enp.bin.cloud.barco.com
-        docker_repo: varun
-        image_name: cheeseshop
-        image_tag: $GITHUB_RUN_NUMBER
-        build_directory: docker-cheeseshop
-        maintainer: "varun.charan@barco.com"
-      secrets:
-        registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
-        registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+  - uses: ./.github/workflows/docker-build-push.yaml
+    with:
+      docker_registry: dockerdev-enp.bin.cloud.barco.com
+      docker_repo: varun
+      image_name: cheeseshop
+      image_tag: $GITHUB_RUN_NUMBER
+      build_directory: docker-cheeseshop
+      maintainer: "varun.charan@barco.com"
+    secrets:
+      registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
+      registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
