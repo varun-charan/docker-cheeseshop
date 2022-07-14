@@ -3,12 +3,11 @@ name: build-push-cheeseshop-image
 on:
   push:
     branches:
+      # Meant for NETxxyy-* tickets
       - feature/*
+      # Meant for DEVOPS-* tickets
       - hotfix/*
-  pull_request:
-    types:
-      - closed
-    branches:
+      # Meant for running after PR merged on master
       - master
 
 jobs:
@@ -37,9 +36,9 @@ jobs:
 
   # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
   dockerdev-enp-push:
-    if: github.ref != 'refs/heads/master'
-    uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
+    if: ${{ github.head_ref != 'master' }}
     needs: [create-master-tag]
+    uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
       docker_registry: dockerdev-enp.bin.cloud.barco.com
       docker_repo: varun
@@ -54,7 +53,7 @@ jobs:
   
   # This is the actual calling job that calls the reusable workflow - to push image into Docker-Enp Artifactory Repo.
   docker-enp-push:
-    if: ${{ github.event.pull_request.merged == true && github.ref == 'refs/heads/master' }}
+    if: ${{ github.head_ref == 'master' }}
     needs: [create-master-tag]
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
