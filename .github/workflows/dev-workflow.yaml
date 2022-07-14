@@ -59,12 +59,13 @@ jobs:
   # This is the actual calling job that calls the reusable workflow.
   docker-enp-push:
     if: github.ref == 'refs/heads/master'
+    needs: [create-master-tag]
     uses: ./.github/workflows/docker-build-push.yaml
     with:
       docker_registry: docker-enp.bin.cloud.barco.com
       docker_repo: varun
       image_name: cheeseshop
-      image_tag: ${{ steps.previoustag.outputs.tag }}
+      image_tag: ${{ needs.create-master-tag.outputs.master-tag }}
       build_directory: docker-cheeseshop
       maintainer: "varun.charan@barco.com"
     secrets:
