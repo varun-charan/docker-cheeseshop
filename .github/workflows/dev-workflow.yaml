@@ -24,7 +24,7 @@ jobs:
       docker_registry: dockerdev-enp.bin.cloud.barco.com
       docker_repo: varun
       image_name: cheeseshop
-      # image_tag: $GITHUB_RUN_NUMBER
+      image_tag: ${{ steps.github-run-number.outputs.github-run-number }}
       build_directory: docker-cheeseshop
       maintainer: "varun.charan@barco.com"
     secrets:
