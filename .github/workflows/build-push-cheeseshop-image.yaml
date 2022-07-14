@@ -1,0 +1,69 @@
+name: build-push-cheeseshop-image
+
+on:
+  push:
+    branches:
+      - feature/*
+      - hotfix/*
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master
+
+jobs:
+  create-master-tag:
+    runs-on: ubuntu-latest
+    name: Create latest tag to be used when creating docker image on master
+    outputs:
+      master-tag: ${{ steps.bump_tag.outputs.new_tag }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '2'
+      
+      - name: Bump version and push tag
+        id: bump_tag
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+        
+      - shell: bash
+        run: |
+          echo "Current Latest Tag: $tag"
+        env:
+          tag: ${{ steps.bump_tag.outputs.new_tag }}
+
+  # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
+  dockerdev-enp-push:
+    if: github.ref != 'refs/heads/master'
+    uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
+    needs: [create-master-tag]
+    with:
+      docker_registry: dockerdev-enp.bin.cloud.barco.com
+      docker_repo: varun
+      image_name: cheeseshop
+      image_tag: ${{ needs.create-master-tag.outputs.master-tag }}
+      build_directory: docker-cheeseshop
+      maintainer: "varun.charan@barco.com"
+    secrets:
+      registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
+      registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+  
+  
+  # This is the actual calling job that calls the reusable workflow - to push image into Docker-Enp Artifactory Repo.
+  docker-enp-push:
+    if: ${{ github.event.pull_request.merged == true && github.ref == 'refs/heads/master' }}
+    needs: [create-master-tag]
+    uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
+    with:
+      docker_registry: docker-enp.bin.cloud.barco.com
+      docker_repo: varun
+      image_name: cheeseshop
+      image_tag: ${{ needs.create-master-tag.outputs.master-tag }}
+      build_directory: docker-cheeseshop
+      maintainer: "varun.charan@barco.com"
+    secrets:
+      registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
+      registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
