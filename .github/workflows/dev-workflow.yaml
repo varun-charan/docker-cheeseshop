@@ -10,6 +10,7 @@ jobs:
   docker-dev:
     runs-on: ubuntu-latest
     steps:
+      - uses: action/checkout@v2
       - shell: bash
         run: |
           pwd
