@@ -38,7 +38,7 @@ jobs:
   # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
   dockerdev-enp-push:
     if: github.ref != 'refs/heads/master'
-    uses: ./.github/workflows/docker-build-push.yaml
+    uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     needs: [create-master-tag]
     with:
       docker_registry: dockerdev-enp.bin.cloud.barco.com
@@ -56,7 +56,7 @@ jobs:
   docker-enp-push:
     if: ${{ github.event.pull_request.merged == true && github.ref == 'refs/heads/master' }}
     needs: [create-master-tag]
-    uses: ./.github/workflows/docker-build-push.yaml
+    uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
       docker_registry: docker-enp.bin.cloud.barco.com
       docker_repo: varun
