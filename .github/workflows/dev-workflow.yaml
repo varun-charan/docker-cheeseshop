@@ -1,11 +1,14 @@
 name: build-push-cheeseshop-image
 
-on:
-  push:
-    branches:
-      - feature/*
-      - hotfix/*
+# on:
+#   push:
+#     branches:
+#       - feature/*
+#       - hotfix/*
   
+on:
+  workflow_dispatch:
+
 jobs:
   debug:
     runs-on: ubuntu-latest
