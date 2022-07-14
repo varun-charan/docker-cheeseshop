@@ -7,7 +7,7 @@ on:
       - hotfix/*
   
 jobs:
-  docker-dev:
+  debug:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -17,14 +17,15 @@ jobs:
           ls -la
           find . -name "docker-build-push.yaml"
 
-    # - uses: ./.github/workflows/docker-build-push.yaml
-    #   with:
-    #     docker_registry: dockerdev-enp.bin.cloud.barco.com
-    #     docker_repo: varun
-    #     image_name: cheeseshop
-    #     image_tag: $GITHUB_RUN_NUMBER
-    #     build_directory: docker-cheeseshop
-    #     maintainer: "varun.charan@barco.com"
-    #   secrets:
-    #     registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
-    #     registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+  docker-dev:
+    - uses: ./.github/workflows/docker-build-push.yaml
+      with:
+        docker_registry: dockerdev-enp.bin.cloud.barco.com
+        docker_repo: varun
+        image_name: cheeseshop
+        image_tag: $GITHUB_RUN_NUMBER
+        build_directory: docker-cheeseshop
+        maintainer: "varun.charan@barco.com"
+      secrets:
+        registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
+        registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
