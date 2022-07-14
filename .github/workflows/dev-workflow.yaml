@@ -9,22 +9,22 @@ on:
 jobs:
   # This job is only here to pass the GITHUB_RUN_NUMBER envVar from this calling workflow to the
   # called workflow. Currently, GitHub does not allow for envVars from calling workflow to be consumed by called workflow. So, this is a workaround/hack.
-  github-run-number:
-    runs-on: ubuntu-latest
-    name: Provide GITHUB_RUN_NUMBER
-    outputs:
-      github-run-number: ${{ steps.github-run-number.outputs.github-run-number }}
-    steps:
-      - id: github-run-number
-        run: |
-          echo "::set-output name=github-run-number::$GITHUB_RUN_NUMBER"
+  # github-run-number:
+  #   runs-on: ubuntu-latest
+  #   name: Provide GITHUB_RUN_NUMBER
+  #   outputs:
+  #     github-run-number: ${{ steps.github-run-number.outputs.github-run-number }}
+  #   steps:
+  #     - id: github-run-number
+  #       run: |
+  #         echo "::set-output name=github-run-number::$GITHUB_RUN_NUMBER"
 
   create-master-tag:
     # if: github.event.base_ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: Create latest tag to be used when creating docker image on master
     outputs:
-      master-tag: ${{ steps.previoustag.outputs.tag }}
+      master-tag: ${{ steps.bump_tag.outputs.new_tag }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -36,12 +36,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: true
-
-      # - name: 'Get Previous tag'
-      #   id: previoustag
-      #   uses: "WyriHaximus/github-action-get-previous-tag@v1.1.0"
-      #   with:
-      #     fallback: 1.0.0 # Optional fallback tag to use when no tag can be found
         
       - shell: bash
         run: |
@@ -53,12 +47,12 @@ jobs:
   dockerdev-enp-push:
     if: github.ref != 'refs/heads/master'
     uses: ./.github/workflows/docker-build-push.yaml
-    needs: [github-run-number]
+    needs: [create-master-tag]
     with:
       docker_registry: dockerdev-enp.bin.cloud.barco.com
       docker_repo: varun
       image_name: cheeseshop
-      image_tag: ${{ needs.github-run-number.outputs.github-run-number }}
+      image_tag: ${{ needs.create-master-tag.outputs.master-tag }}
       build_directory: docker-cheeseshop
       maintainer: "varun.charan@barco.com"
     secrets:
@@ -67,7 +61,7 @@ jobs:
   
   # This is the actual calling job that calls the reusable workflow.
   docker-enp-push:
-    if: github.ref == 'refs/heads/master'
+    # if: github.ref == 'refs/heads/master'
     needs: [create-master-tag]
     uses: ./.github/workflows/docker-build-push.yaml
     with:
