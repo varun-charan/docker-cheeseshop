@@ -27,9 +27,12 @@ jobs:
       master-tag: ${{ steps.previoustag.outputs.tag }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: '2'
       
       # - name: Bump all tags everywhere
       #   uses: undergroundwires/bump-everywhere@master
+
       - name: 'Get Previous tag'
         id: previoustag
         uses: "WyriHaximus/github-action-get-previous-tag@v1.1.0"
