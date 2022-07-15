@@ -23,7 +23,6 @@ jobs:
     name: Get the next version of the tag
     outputs:
       next-tag: ${{ steps.get_next_tag.outputs.new_tag }}
-      changelog: ${{ steps.get_next_tag.outputs.changelog }}
     steps:
       - uses: actions/checkout@v2
       
@@ -43,12 +42,10 @@ jobs:
         shell: bash
         run: |
           echo "Current Latest Tag: $tag"
-          echo "New Changelog: $changelog"
           echo "Github ref: ${{ github.ref }}"
           echo "Pull Req Base Ref: ${{ github.event.pull_request.base.ref }}"
         env:
           tag: ${{ steps.get_next_tag.outputs.new_tag }}
-          changelog: "${{ steps.get_next_tag.outputs.changelog }}"
 
 
   # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
@@ -102,5 +99,4 @@ jobs:
         with:
           tag: ${{ needs.get-next-tag-version.outputs.next-tag }}
           name: ${{ needs.get-next-tag-version.outputs.next-tag }}
-          body: "${{ needs.get-next-tag-version.outputs.changelog }}"
           generateReleaseNotes: true
