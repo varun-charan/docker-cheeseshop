@@ -14,6 +14,8 @@ on:
     branches:
       # Meant for running after PR merged on master
       - master
+  # For manual trigger of job, if required. Avoids need to use dummy commits to initiate workflow.Applicable to master branch only since for it, source tag is picked from Git tags and not from Commit hash as is the case for dev branches.
+  workflow_dispatch:
 
 jobs:
   get-next-tag-version:
@@ -36,7 +38,8 @@ jobs:
           # Helps avoid duplicate Docker image tags when two branches are created from same master commit.
           append_to_pre_release_tag: ${{ format('{0}.{1}', github.actor, github.sha) }}
         
-      - shell: bash
+      - name: Debug
+        shell: bash
         run: |
           echo "Current Latest Tag: $tag"
           echo "Github ref: ${{ github.ref }}"
@@ -47,7 +50,7 @@ jobs:
 
   # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
   dockerdev-enp-push:
-    if: ${{ always() && github.ref != 'master' }}
+    if: ${{ github.ref != 'master' }}
     needs: [ get-next-tag-version ]
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
@@ -64,7 +67,7 @@ jobs:
   
   # This is the actual calling job that calls the reusable workflow - to push image into Docker-Enp Artifactory Repo.
   docker-enp-push:
-    if: ${{ always() && github.ref == 'master' }}
+    if: ${{ github.ref == 'master' }}
     needs: [ get-next-tag-version ]
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
@@ -78,19 +81,22 @@ jobs:
       registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
       registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
-
   # # After a Docker image with the next version has been created, create a tag for the same in Git repo.
   create-next-tag-version:
     runs-on: ubuntu-latest
     needs: [ get-next-tag-version, dockerdev-enp-push, docker-enp-push ]
-    if: ${{ always() && github.ref == 'master' && contains(join(needs.*.result, ','), 'success') }}
+    if: |
+      always() && 
+      github.ref == 'master' &&
+      ( (needs.dockerdev-enp-push.result == 'success') || (needs.docker-enp-push.result == 'success') )
     name: Create the next version of the tag
     steps:
       - uses: actions/checkout@v2
-        
+
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ needs.get-next-tag-version.outputs.next-tag }}
-          name: Release ${{ needs.get-next-tag-version.outputs.next-tag }}
-          body: ${{ needs.get-next-tag-version.outputs.next-tag }}
+          name: ${{ needs.get-next-tag-version.outputs.next-tag }}
+          # Generates awesome release notes that you can edit later if you want.
+          generateReleaseNotes: true
