@@ -96,13 +96,6 @@ jobs:
     name: Create the next version of the tag
     steps:
       - uses: actions/checkout@v2
-        
-      # - name: Create a GitHub release
-      #   uses: ncipollo/release-action@v1
-      #   with:
-      #     tag: ${{ needs.get-next-tag-version.outputs.next-tag }}
-      #     name: Release ${{ needs.get-next-tag-version.outputs.next-tag }}
-      #     body: ${{ needs.get-next-tag-version.outputs.changelog }}
 
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
