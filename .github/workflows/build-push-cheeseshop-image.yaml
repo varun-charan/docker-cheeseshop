@@ -45,7 +45,7 @@ jobs:
           echo "Current Latest Tag: $tag"
           # Populate 
           echo "NEXT_TAG=$tag" >> $GITHUB_ENV
-          echo "CHANGELOG=\"$changelog\"" >> $GITHUB_ENV
+          echo "CHANGELOG=$changelog" >> $GITHUB_ENV
           echo "Github ref: ${{ github.ref }}"
           echo "Pull Req Base Ref: ${{ github.event.pull_request.base.ref }}"
         env:
