@@ -15,9 +15,9 @@ on:
       # Meant for running after PR merged on master
       - master
 
-env:
-  NEXT_TAG: ""
-  CHANGELOG: ""
+# env:
+#   NEXT_TAG: ""
+#   CHANGELOG: ""
 
 jobs:
   get-next-tag-version:
@@ -43,8 +43,9 @@ jobs:
       - shell: bash
         run: |
           echo "Current Latest Tag: $tag"
-          echo "::set-output name=NEXT_TAG::${{ steps.get_next_tag.outputs.next-tag }}"
-          echo "::set-output name=CHANGELOG::${{ steps.get_next_tag.outputs.changelog }}"
+          # Populate 
+          echo ${{ steps.get_next_tag.outputs.next-tag }} >> $GITHUB_ENV
+          echo ${{ steps.get_next_tag.outputs.changelog }}" >> $GITHUB_ENV
           echo "Github ref: ${{ github.ref }}"
           echo "Pull Req Base Ref: ${{ github.event.pull_request.base.ref }}"
         env:
@@ -83,17 +84,6 @@ jobs:
     secrets:
       registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
       registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
-
-  # # After a Docker image with the next version has been created, create a tag for the same in Git repo.
-  debug:
-    runs-on: ubuntu-latest
-    needs: [ get-next-tag-version, dockerdev-enp-push ]
-    steps:
-    - name: debug
-      shell: bash
-      run: |
-        echo ${{ toJSON(needs) }}
-        echo ${{ !needs.get-next-tag-version }}
 
   # # After a Docker image with the next version has been created, create a tag for the same in Git repo.
   create-next-tag-version:
