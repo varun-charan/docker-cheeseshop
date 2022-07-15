@@ -34,7 +34,7 @@ jobs:
           dry_run: true
           # default_prerelease_bump: prepatch
           # Helps avoid duplicate Docker image tags when two branches are created from same master commit.
-          append_to_pre_release_tag: ${{ format('{0}.{1}', github.actor, github.sha) }}
+          # append_to_pre_release_tag: ${{ format('{0}.{1}', github.actor, github.sha) }}
         
       - shell: bash
         run: |
