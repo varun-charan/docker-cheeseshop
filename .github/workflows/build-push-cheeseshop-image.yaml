@@ -31,6 +31,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # DO NOT create Git tag. Just calculate new tag version.
           dry_run: true
+          default_bump: minor
+          default_prerelease_bump: preminor
           # Helps avoid duplicate Docker image tags when two branches are created from same master commit.
           append_to_pre_release_tag: ${{ format('{0}.{1}', github.actor, github.sha) }}
         
@@ -41,6 +43,7 @@ jobs:
           echo "Pull Req Base Ref: ${{ github.event.pull_request.base.ref }}"
         env:
           tag: ${{ steps.get_next_tag.outputs.new_tag }}
+
 
   # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
   dockerdev-enp-push:
@@ -74,6 +77,7 @@ jobs:
     secrets:
       registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
       registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
 
   # # After a Docker image with the next version has been created, create a tag for the same in Git repo.
   create-next-tag-version:
