@@ -50,7 +50,7 @@ jobs:
 
   # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
   dockerdev-enp-push:
-    if: ${{ github.ref != 'master' }}
+    if: ${{ github.ref != 'master' || github.ref != 'refs/heads/master' }}
     needs: [ get-next-tag-version ]
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
@@ -67,7 +67,7 @@ jobs:
   
   # This is the actual calling job that calls the reusable workflow - to push image into Docker-Enp Artifactory Repo.
   docker-enp-push:
-    if: ${{ github.ref == 'master' }}
+    if: ${{ github.ref == 'master' || github.ref == 'refs/heads/master' }}
     needs: [ get-next-tag-version ]
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
@@ -86,8 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ get-next-tag-version, dockerdev-enp-push, docker-enp-push ]
     if: |
-      always() && 
-      github.ref == 'master' &&
+      ( github.ref == 'master' || github.ref == 'refs/heads/master' ) &&
       ( (needs.dockerdev-enp-push.result == 'success') || (needs.docker-enp-push.result == 'success') )
     name: Create the next version of the tag
     steps:
