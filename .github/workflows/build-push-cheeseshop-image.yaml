@@ -84,12 +84,9 @@ jobs:
     needs: [ get-next-tag-version, dockerdev-enp-push ]
     steps:
     - name: debug
-      uses: actions/github-script@v5
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          console.log(join(needs.*.result, ','))
-          console.log(needs.*.result)
+      shell: bash
+      run: |
+        echo ${{ join(needs.*.result, ',') }}
 
   # # After a Docker image with the next version has been created, create a tag for the same in Git repo.
   create-next-tag-version:
