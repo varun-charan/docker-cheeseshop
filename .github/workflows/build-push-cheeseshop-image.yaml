@@ -86,7 +86,8 @@ jobs:
     - name: debug
       shell: bash
       run: |
-        echo ${{ toJSON(needs) }}
+        echo ${{ needs }}
+        echo ${{ needs.get-next-tag-version }}
 
   # # After a Docker image with the next version has been created, create a tag for the same in Git repo.
   create-next-tag-version:
