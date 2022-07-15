@@ -14,6 +14,8 @@ on:
     branches:
       # Meant for running after PR merged on master
       - master
+  # For manual trigger of job, if required. Avoids need to use dummy commits to initiate workflow.Applicable to master branch only since for it, source tag is picked from Git tags and not from Commit hash as is the case for dev branches.
+  workflow_dispatch:
 
 # env:
 #   NEXT_TAG: ""
@@ -90,7 +92,7 @@ jobs:
   create-next-tag-version:
     runs-on: ubuntu-latest
     needs: [ dockerdev-enp-push, docker-enp-push ]
-    if: ${{ github.ref != 'master' && contains(join(needs.*.result, ','), 'success') }}
+    # if: ${{ github.ref == 'master' && contains(join(needs.*.result, ','), 'success') }}
     name: Create the next version of the tag
     steps:
       - uses: actions/checkout@v2
