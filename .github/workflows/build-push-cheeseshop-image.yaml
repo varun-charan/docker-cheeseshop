@@ -93,6 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ dockerdev-enp-push, docker-enp-push ]
     # if: ${{ github.ref == 'master' && contains(join(needs.*.result, ','), 'success') }}
+    if: ${{ always() && github.ref != 'master' && contains(join(needs.*.result, ','), 'success') }}
     name: Create the next version of the tag
     steps:
       - uses: actions/checkout@v2
