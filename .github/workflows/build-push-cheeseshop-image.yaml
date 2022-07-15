@@ -80,12 +80,12 @@ jobs:
 
   # # After a Docker image with the next version has been created, create a tag for the same in Git repo.
   debug:
-    - needs: [ get-next-tag-version, dockerdev-enp-push, docker-enp-push ]
-      uses: actions/github-script@v5
-      with:
-        scripts: |
-          console.log(join(needs.*.result, ','))
-          console.log(needs.*.result)
+  - needs: [ get-next-tag-version, dockerdev-enp-push, docker-enp-push ]
+    uses: actions/github-script@v5
+    with:
+      scripts: |
+        console.log(join(needs.*.result, ','))
+        console.log(needs.*.result)
 
   # # After a Docker image with the next version has been created, create a tag for the same in Git repo.
   create-next-tag-version:
