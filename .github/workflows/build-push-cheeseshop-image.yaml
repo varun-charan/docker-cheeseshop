@@ -49,7 +49,7 @@ jobs:
 
 
   # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
-  invoke-reusable-workflow:
+  invoke-reusable:
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@feature/do-everything-with-reusable-workflow
     with:
       app_github_repo: varun-charan/docker-cheeseshop
@@ -57,7 +57,6 @@ jobs:
       docker_registry: docker-enp.bin.cloud.barco.com
       docker_repo: varun
       image_name: cheeseshop
-      image_tag: ${{ needs.get-next-tag-version.outputs.next-tag }}
       build_directory: docker-cheeseshop
       maintainer: "varun.charan@barco.com"
     secrets:
