@@ -50,7 +50,7 @@ jobs:
 
   # This is the actual calling job that calls the reusable workflow - to push image into DockerDev-Enp Artifactory Repo.
   invoke-docker-build-push-reusable-workflow:
-    uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
+    uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@feature/do-everything-with-reusable-workflow
     with:
       app_github_repo: varun-charan/docker-cheeseshop
       dockerdev_registry: dockerdev-enp.bin.cloud.barco.com
