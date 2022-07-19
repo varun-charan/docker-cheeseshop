@@ -22,12 +22,12 @@ jobs:
   invoke-reusable:
     uses: varun-charan/reusable-workflows/.github/workflows/docker-build-push.yaml@master
     with:
-      dockerdev_registry: dockerdev-enp.bin.cloud.barco.com
-      docker_registry: docker-enp.bin.cloud.barco.com
+      dockerdev_registry: ${{ secrets.DOCKERDEV_REPO }}
+      docker_registry: ${{ secrets.DOCKER_REPO }}
       docker_repo: varun
       image_name: cheeseshop
       build_directory: docker-cheeseshop
-      maintainer: "varun.charan@barco.com"
+      maintainer: "varun.charan"
     secrets:
       registry_username: ${{ secrets.ARTIFACTORY_USERNAME }}
       registry_password: ${{ secrets.ARTIFACTORY_PASSWORD }}
